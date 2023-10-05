@@ -1,7 +1,7 @@
 # Makefile for C-Minus Scanner
 # ./lex/tiny.l --> ./cminus.l
 
-CC = gcc
+CC = clang
 
 CFLAGS = -W -Wall
 
@@ -19,7 +19,7 @@ cminus_cimpl: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) 
 
 cminus_lex: $(OBJS_LEX)
-	$(CC) $(CFLAGS) -o $@ $(OBJS_LEX) -lfl
+	$(CC) $(CFLAGS) -o $@ $(OBJS_LEX) -ll
 
 main.o: main.c globals.h util.h scan.h
 	$(CC) $(CFLAGS) -c -o $@ $<
