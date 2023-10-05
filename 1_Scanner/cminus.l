@@ -5,6 +5,7 @@
 /* Kenneth C. Louden                                */
 /****************************************************/
 
+/* SI: definition section, c header/declaration, regex naming... */
 %{
 #include "globals.h"
 #include "util.h"
