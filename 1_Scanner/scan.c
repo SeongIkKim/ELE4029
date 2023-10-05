@@ -11,7 +11,10 @@
 
 /* states in scanner DFA */
 typedef enum
-   { START,INASSIGN,INCOMMENT,INNUM,INID,DONE }
+   { 
+    START,INCOMMENT,INNUM,INID,DONE,
+    INEQ,INLT,INGT,INNE,INOVER,INCOMMENT,INCOMMENT_, // SI: additional state
+   }
    StateType;
 
 /* lexeme of identifier or reserved word */
@@ -55,10 +58,14 @@ static void ungetNextChar(void)
 static struct
     { char* str;
       TokenType tok;
-    } reservedWords[MAXRESERVED]
-   = {{"if",IF},{"then",THEN},{"else",ELSE},{"end",END},
-      {"repeat",REPEAT},{"until",UNTIL},{"read",READ},
-      {"write",WRITE}};
+    } reservedWords[MAXRESERVED] = {
+      {"if",IF},
+      {"else",ELSE},
+      {"while",WHILE},
+      {"return",RETURN},
+      {"int",INT},
+      {"void",VOID},
+    };
 
 /* lookup an identifier to see if it is a reserved word */
 /* uses linear search */
@@ -76,12 +83,14 @@ static TokenType reservedLookup (char * s)
 /* function getToken returns the 
  * next token in source file
  */
+// TODO: C-minus token들로 바꿀것
+// FIXME: additional state, useless state 처리
 TokenType getToken(void)
 {  /* index for storing into tokenString */
    int tokenStringIndex = 0;
-   /* holds current token to be returned */
+   /* holds current token to be returned; recognized token을 의미함 */
    TokenType currentToken;
-   /* current state - always begins at START */
+   /* current state - always begins at START; DFA에서의 current state */
    StateType state = START;
    /* flag to indicate save to tokenString */
    int save;
@@ -94,8 +103,6 @@ TokenType getToken(void)
            state = INNUM;
          else if (isalpha(c))
            state = INID;
-         else if (c == ':')
-           state = INASSIGN;
          else if ((c == ' ') || (c == '\t') || (c == '\n'))
            save = FALSE;
          else if (c == '{')
@@ -104,6 +111,9 @@ TokenType getToken(void)
          }
          else
          { state = DONE;
+           // TODO:  추가
+           // TODO: ==, <=, >=
+           // FIXME: INASSIGN 필요없음
            switch (c)
            { case EOF:
                save = FALSE;
@@ -150,17 +160,17 @@ TokenType getToken(void)
          }
          else if (c == '}') state = START;
          break;
-       case INASSIGN:
-         state = DONE;
-         if (c == '=')
-           currentToken = ASSIGN;
-         else
-         { /* backup in the input */
-           ungetNextChar();
-           save = FALSE;
-           currentToken = ERROR;
-         }
-         break;
+      //  case INASSIGN:
+      //    state = DONE;
+      //    if (c == '=')
+      //      currentToken = ASSIGN;
+      //    else
+      //    { /* backup in the input */
+      //      ungetNextChar();
+      //      save = FALSE;
+      //      currentToken = ERROR;
+      //    }
+      //    break;
        case INNUM:
          if (!isdigit(c))
          { /* backup in the input */
