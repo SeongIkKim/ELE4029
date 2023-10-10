@@ -103,7 +103,8 @@ TokenType getToken(void) { /* index for storing into tokenString */
         save = TRUE;
         switch (state) {
         case START:
-            // 2글자 이상의 파싱이 필요한 것들 - look ahead해야하므로 state로 진입
+            // 2글자 이상의 파싱이 필요한 것들 - look ahead해야하므로 state로
+            // 진입
             if (isdigit(c))
                 state = INNUM;
             else if (isalpha(c))
@@ -117,12 +118,11 @@ TokenType getToken(void) { /* index for storing into tokenString */
             else if (c == '!')
                 state = INNE;
             // 무시할 것들
+            else if (c == '/')
+                state = INOVER;
             else if ((c == ' ') || (c == '\t') || (c == '\n'))
                 save = FALSE;
-            else if (c == '{') {
-                save = FALSE;
-                state = INCOMMENT;
-            } else {
+            else {
                 // 이외의 케이스는 모두 한 글자로 파싱 가능 - currentToken 확정
                 state = DONE;
                 switch (c) {
@@ -139,10 +139,6 @@ TokenType getToken(void) { /* index for storing into tokenString */
                 case '*':
                     currentToken = TIMES;
                     break;
-                // TODO: OVER, INCOMMENT state 진입
-                // case '/':
-                //     currentToken = OVER;
-                //     break;
                 case '(':
                     currentToken = LPAREN;
                     break;
@@ -166,32 +162,37 @@ TokenType getToken(void) { /* index for storing into tokenString */
                     break;
                 case ',':
                     currentToken = COMMA;
+                    break;
                 default:
                     currentToken = ERROR;
                     break;
                 }
             }
             break;
-        // /* example */
-        // case INASSIGN:
-        //   state = DONE;
-        //   if (c == '=')
-        //     currentToken = ASSIGN;
-        //   else
-        //   { /* backup in the input */
-        //     ungetNextChar();
-        //     save = FALSE;
-        //     currentToken = ERROR;
-        //   }
-        //   break;
-        // FIXME: INCOMMENT 변경필요?
+        case INOVER:
+            if (c == '*') {
+                save = FALSE;
+                state = INCOMMENT;
+            } else {
+                ungetNextChar();
+                save = FALSE;
+                state = DONE;
+                currentToken = OVER;
+            }
+            break;
         case INCOMMENT:
             save = FALSE;
-            if (c == EOF) {
-                state = DONE;
-                currentToken = ENDFILE;
-            } else if (c == '}')
+            if (c == '*')
+                state = INCOMMENT_;
+            break;
+        case INCOMMENT_:
+            save = FALSE;
+            if (c == '/') {
+                tokenString[0] = '\0';
+                tokenStringIndex = 0;
                 state = START;
+            } else
+                state = INCOMMENT;
             break;
         case INNUM:
             if (!isdigit(c)) { /* backup in the input */
@@ -250,7 +251,6 @@ TokenType getToken(void) { /* index for storing into tokenString */
                 currentToken = ERROR;
             }
             break;
-        // TODO:case INOVER:
         case DONE:
         default: /* should never happen */
             fprintf(listing, "Scanner Bug: state= %d\n", state);
