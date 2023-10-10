@@ -182,12 +182,18 @@ TokenType getToken(void) { /* index for storing into tokenString */
             break;
         case INCOMMENT:
             save = FALSE;
-            if (c == '*')
+            if (c == EOF) {
+                state = DONE;
+                currentToken = ENDFILE;
+            } else if (c == '*')
                 state = INCOMMENT_;
             break;
         case INCOMMENT_:
             save = FALSE;
-            if (c == '/') {
+            if (c == EOF) {
+                state = DONE;
+                currentToken = ENDFILE;
+            } else if (c == '/') {
                 tokenString[0] = '\0';
                 tokenStringIndex = 0;
                 state = START;
