@@ -13,7 +13,7 @@
 typedef enum
    { 
     START,INCOMMENT,INNUM,INID,DONE,
-    INEQ,INLT,INGT,INNE,INOVER,INCOMMENT,INCOMMENT_, // SI: additional state
+    INEQ,INLT,INGT,INNE,INOVER,INCOMMENT_, // SI: additional state
    }
    StateType;
 
