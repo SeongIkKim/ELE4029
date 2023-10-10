@@ -78,6 +78,7 @@ void printToken(TokenType token, const char *tokenString) {
         break;
     case COMMA:
         fprintf(listing, ",\n");
+        break;
     case PLUS:
         fprintf(listing, "+\n");
         break;
