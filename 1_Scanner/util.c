@@ -16,22 +16,22 @@
 void printToken(TokenType token, const char *tokenString) {
     switch (token) {
     case IF:
-        fprintf(listing, "reserved word: if\n", tokenString);
+        fprintf(listing, "reserved word: if\n");
         break;
     case ELSE:
-        fprintf(listing, "reserved word: else\n", tokenString);
+        fprintf(listing, "reserved word: else\n");
         break;
     case WHILE:
-        fprintf(listing, "reserved word: while\n", tokenString);
+        fprintf(listing, "reserved word: while\n");
         break;
     case RETURN:
-        fprintf(listing, "reserved word: return\n", tokenString);
+        fprintf(listing, "reserved word: return\n");
         break;
     case INT:
-        fprintf(listing, "reserved word: int\n", tokenString);
+        fprintf(listing, "reserved word: int\n");
         break;
     case VOID:
-        fprintf(listing, "reserved word: void\n", tokenString);
+        fprintf(listing, "reserved word: void\n");
         break;
     case ASSIGN:
         // fprintf(listing, ":=\n");
