@@ -90,8 +90,6 @@ static TokenType reservedLookup(char *s) {
 /* function getToken returns the
  * next token in source file
  */
-// TODO: C-minus token들로 바꿀것
-// FIXME: additional state, useless state 처리
 TokenType getToken(void) { /* index for storing into tokenString */
     int tokenStringIndex = 0;
     /* holds current token to be returned; recognized token을 의미함 */
@@ -105,30 +103,32 @@ TokenType getToken(void) { /* index for storing into tokenString */
         save = TRUE;
         switch (state) {
         case START:
+            // 2글자 이상의 파싱이 필요한 것들 - look ahead해야하므로 state로 진입
             if (isdigit(c))
                 state = INNUM;
             else if (isalpha(c))
                 state = INID;
+            else if (c == '=')
+                state = INEQ;
+            else if (c == '<')
+                state = INLT;
+            else if (c == '>')
+                state = INGT;
+            else if (c == '!')
+                state = INNE;
+            // 무시할 것들
             else if ((c == ' ') || (c == '\t') || (c == '\n'))
                 save = FALSE;
             else if (c == '{') {
                 save = FALSE;
                 state = INCOMMENT;
             } else {
+                // 이외의 케이스는 모두 한 글자로 파싱 가능 - currentToken 확정
                 state = DONE;
-                // TODO:  추가
-                // TODO: ==, <=, >=
-                // FIXME: INASSIGN 필요없음
                 switch (c) {
                 case EOF:
                     save = FALSE;
                     currentToken = ENDFILE;
-                    break;
-                case '=':
-                    currentToken = EQ;
-                    break;
-                case '<':
-                    currentToken = LT;
                     break;
                 case '+':
                     currentToken = PLUS;
@@ -139,24 +139,52 @@ TokenType getToken(void) { /* index for storing into tokenString */
                 case '*':
                     currentToken = TIMES;
                     break;
-                case '/':
-                    currentToken = OVER;
-                    break;
+                // TODO: OVER, INCOMMENT state 진입
+                // case '/':
+                //     currentToken = OVER;
+                //     break;
                 case '(':
                     currentToken = LPAREN;
                     break;
                 case ')':
                     currentToken = RPAREN;
                     break;
+                case '[':
+                    currentToken = LBRACE;
+                    break;
+                case ']':
+                    currentToken = RBRACE;
+                    break;
+                case '{':
+                    currentToken = LCURLY;
+                    break;
+                case '}':
+                    currentToken = RCURLY;
+                    break;
                 case ';':
                     currentToken = SEMI;
                     break;
+                case ',':
+                    currentToken = COMMA;
                 default:
                     currentToken = ERROR;
                     break;
                 }
             }
             break;
+        // /* example */
+        // case INASSIGN:
+        //   state = DONE;
+        //   if (c == '=')
+        //     currentToken = ASSIGN;
+        //   else
+        //   { /* backup in the input */
+        //     ungetNextChar();
+        //     save = FALSE;
+        //     currentToken = ERROR;
+        //   }
+        //   break;
+        // FIXME: INCOMMENT 변경필요?
         case INCOMMENT:
             save = FALSE;
             if (c == EOF) {
@@ -165,17 +193,6 @@ TokenType getToken(void) { /* index for storing into tokenString */
             } else if (c == '}')
                 state = START;
             break;
-            //  case INASSIGN:
-            //    state = DONE;
-            //    if (c == '=')
-            //      currentToken = ASSIGN;
-            //    else
-            //    { /* backup in the input */
-            //      ungetNextChar();
-            //      save = FALSE;
-            //      currentToken = ERROR;
-            //    }
-            //    break;
         case INNUM:
             if (!isdigit(c)) { /* backup in the input */
                 ungetNextChar();
@@ -185,13 +202,55 @@ TokenType getToken(void) { /* index for storing into tokenString */
             }
             break;
         case INID:
-            if (!isalpha(c)) { /* backup in the input */
+            if ((!isalpha(c)) && (!isdigit(c))) { /* backup in the input */
                 ungetNextChar();
                 save = FALSE;
                 state = DONE;
                 currentToken = ID;
             }
             break;
+
+        case INEQ:
+            state = DONE;
+            if (c == '=')
+                currentToken = EQ;
+            else {
+                ungetNextChar();
+                save = FALSE;
+                currentToken = ASSIGN;
+            }
+            break;
+        case INLT:
+            state = DONE;
+            if (c == '=')
+                currentToken = LE;
+            else {
+                ungetNextChar();
+                save = FALSE;
+                currentToken = LT;
+            }
+            break;
+        case INGT:
+            state = DONE;
+            if (c == '=')
+                currentToken = GE;
+            else {
+                ungetNextChar();
+                save = FALSE;
+                currentToken = GT;
+            }
+            break;
+        case INNE:
+            state = DONE;
+            if (c == '=')
+                currentToken = NE;
+            else {
+                ungetNextChar();
+                save = FALSE;
+                currentToken = ERROR;
+            }
+            break;
+        // TODO:case INOVER:
         case DONE:
         default: /* should never happen */
             fprintf(listing, "Scanner Bug: state= %d\n", state);
