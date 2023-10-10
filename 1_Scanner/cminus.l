@@ -29,16 +29,25 @@ whitespace  [ \t]+
 "return"        {return RETURN;}
 "int"           {return INT;}
 "void"          {return VOID;}
-":="            {return ASSIGN;}
-"="             {return EQ;}
+"="             {return ASSIGN;}
+"=="            {return EQ;}
+"!="            {return NE;}
 "<"             {return LT;}
+"<="            {return LE;}
+">"             {return GT;}
+">="            {return GE;}
 "+"             {return PLUS;}
 "-"             {return MINUS;}
 "*"             {return TIMES;}
 "/"             {return OVER;}
 "("             {return LPAREN;}
 ")"             {return RPAREN;}
+"["             {return LBRACE;}
+"]"             {return RBRACE;}
+"{"             {return LCURLY;}
+"}"             {return RCURLY;}
 ";"             {return SEMI;}
+","             {return COMMA;}
 {number}        {return NUM;}
 {identifier}    {return ID;}
 {newline}       {lineno++;}
@@ -49,6 +58,23 @@ whitespace  [ \t]+
                     if (c == EOF) break;
                     if (c == '\n') lineno++;
                   } while (c != '}');
+                }
+"/*"            { char c;
+                  int done = 0;
+                  do
+                  {
+                    c = input();
+                    if (c == EOF) break;
+                    else if (c == '\n') lineno++;
+                    else if (c == '*') {
+                      c = input();
+                      if (c == EOF) break;
+                      else if (c == '\n') lineno++;
+                      else if (c == '/'){
+                        done = 1;
+                      }
+                    }
+                  } while (done == 0);
                 }
 .               {return ERROR;}
 
