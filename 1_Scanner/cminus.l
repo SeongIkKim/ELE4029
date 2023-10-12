@@ -64,11 +64,11 @@ whitespace  [ \t]+
                   do
                   {
                     c = input();
-                    if (c == EOF) break;
+                    if (c == EOF || c == '\0') break;
                     else if (c == '\n') lineno++;
                     else if (c == '*') {
                       c = input();
-                      if (c == EOF) break;
+                      if (c == EOF || c == '\0') break;
                       else if (c == '\n') lineno++;
                       else if (c == '/'){
                         done = 1;
@@ -77,7 +77,7 @@ whitespace  [ \t]+
                   } while (done == 0);
                 }
 .               {return ERROR;}
-
+"\0"            {return ENDFILE;} // 환경에 따라 EOF 대신 \0으로 받을수도 있음
 %%
 
 TokenType getToken(void)
