@@ -1,5 +1,5 @@
 
-C-MINUS COMPILATION: comment_example.cm
+C-MINUS COMPILATION: example/test2.cm
 	1: ID, name= A
 	3: /
 	3: *

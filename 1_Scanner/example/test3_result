@@ -1,5 +1,5 @@
 
-C-MINUS COMPILATION: test3.cm
+C-MINUS COMPILATION: example/test3.cm
 	1: reserved word: return
 	2: reserved word: void
 	3: reserved word: while

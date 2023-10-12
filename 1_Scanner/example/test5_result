@@ -1,5 +1,5 @@
 
-C-MINUS COMPILATION: test5.cm
+C-MINUS COMPILATION: example/test5.cm
 	1: reserved word: void
 	1: ID, name= main
 	1: (

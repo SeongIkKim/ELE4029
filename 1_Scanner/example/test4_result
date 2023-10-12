@@ -1,5 +1,5 @@
 
-C-MINUS COMPILATION: test4.cm
+C-MINUS COMPILATION: example/test4.cm
 	1: ID, name= ab
 	2: ID, name= abcd
 	3: ID, name= a13
