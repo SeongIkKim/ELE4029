@@ -52,23 +52,16 @@ whitespace  [ \t]+
 {identifier}    {return ID;}
 {newline}       {lineno++;}
 {whitespace}    {/* skip whitespace */}
-"{"             { char c;
-                  do
-                  { c = input();
-                    if (c == EOF) break;
-                    if (c == '\n') lineno++;
-                  } while (c != '}');
-                }
 "/*"            { char c;
                   int done = 0;
                   do
                   {
                     c = input();
-                    if (c == EOF || c == '\0') break;
+                    if (c == EOF || c == '\0') return ENDFILE;
                     else if (c == '\n') lineno++;
                     else if (c == '*') {
                       c = input();
-                      if (c == EOF || c == '\0') break;
+                      if (c == EOF || c == '\0') return ENDFILE;
                       else if (c == '\n') lineno++;
                       else if (c == '/'){
                         done = 1;
