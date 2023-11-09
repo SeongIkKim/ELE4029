@@ -1,0 +1,13 @@
+# outputs of makefile
+cminus_parser
+main.o
+util.o
+scan.o
+lex.yy.c
+lex.yy.o
+y.tab.h
+y.tab.c
+y.tab.o
+y.output
+
+
