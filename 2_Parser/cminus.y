@@ -219,19 +219,22 @@ expression          : var ASSIGN expression
                     | simple_expression { $$ = $1; }
                     ;
 var                 : identifier
-                         { 
-                              
+                         {
+                              $$ = newTreeNode(VarAccessExpr);
+                              $$->lineno = $1->lineno;
+                              $$->name = $1->name;
+                              /* TODO: free? */
                          }
                     | identifier LBRACE expression RBRACE
                          {
-						/* variable accessing & array indexing */
-                              /* TODO: child[0] = expression(maybe simple??) */
+                              $$ = newTreeNode(VarAccessExpr);
+                              $$->lineno = $1->lineno;
+                              $$->name = $1->name;
+                              $$->child[0] = $3;
                          }
                     ;
 simple_expression   : additive_expression relop additive_expression
                          { 
-						/* add left-hand-side(lhs), right-hand-side(rhs) as children */
-                              /* TODO: child[0] = lhs, child[1] = rhs */
                               $$ = newTreeNode(BinOpExpr);
                               $$->lineno = lineno;
                               $$->opcode = $2->opcode;
