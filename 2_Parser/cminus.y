@@ -70,10 +70,22 @@ var_declaration     : type_specifier identifier SEMI
                     ;
 type_specifier      : INT  { $$ = newTreeNode(TypeSpecifier); $$->lineno = lineno; $$->type = Integer; }
                     | VOID { $$ = newTreeNode(TypeSpecifier); $$->lineno = lineno; $$->type = Void; }
-                    ; /* TODO: int[], void[] type 처리 추가 */
+                    | INT LBRACE RBRACE
+                         {
+                              $$ = newTreeNode(TypeSpecifier);
+                              $$->lineno = lineno;
+                              $$->type = IntegerArray;
+                         }
+                    | VOID LBRACE RBRACE
+                         {
+                              $$ = newTreeNode(TypeSpecifier);
+                              $$->lineno = lineno;
+                              $$->type = VoidArray;
+                         }
+                    ;
 fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_stmt
                          { 
-                              /* TODO: child[0] = params, child[1] = compound_stmt */
+
                               $$ = newTreeNode(FunctionDecl);
                               $$->lineno = $2->lineno;
                               $$->type = $1->type;
@@ -95,9 +107,12 @@ param_list          : param_list COMMA param
                          {
 						/* declaration_list 참고 */	
                               YYSTYPE t = $1;
-                              while (t->sibling != NULL) t = t->sibling;
-                              t->sibling = $3;
-                              $$ = $1;
+                              if (t != NULL){
+                                   while (t->sibling != NULL) t = t->sibling;
+                                   t->sibling = $3;
+                                   $$ = $1;
+                              }
+                              else $$ = $3;
                          }
                     | param { $$ = $1; }
                     ;
@@ -122,18 +137,35 @@ param               : type_specifier identifier
                     ;
 compound_stmt       : LCURLY local_declarations statement_list RCURLY
                          { 
-                              /* TODO: child[0] = local_declarations, child[1] = statement_list */
+                              $$ = newTreeNode(CompoundStmt);
+                              $$->lineno = lineno;
+                              $$->child[0] = $2;
+                              $$->child[1] = $3;
                          }
                     ;
 local_declarations  : local_declarations var_declaration
                          {
-							
+                              YYSTYPE t = $1;
+                              if (t != NULL)
+                              {
+                                   while (t->sibling != NULL) t = t->sibling;
+                                   t->sibling = $2; 
+                                   $$ = $1; 
+                              }
+                              else $$ = $2;
                          }
                     | empty { }
                     ;
 statement_list      : statement_list statement
                          { 
-						/* declaration_list 참고 */	
+						YYSTYPE t = $1;
+                              if (t != NULL)
+                              {
+                                   while (t->sibling != NULL) t = t->sibling;
+                                   t->sibling = $2;
+                                   $$ = $1;
+                              }
+                              else $$ = $2;
                          }
                     | empty {  }
                     ;
