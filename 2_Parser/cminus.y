@@ -169,19 +169,27 @@ statement_list      : statement_list statement
                          }
                     | empty {  }
                     ;
-statement			: selection_stmt { $$ = $1; } /* TODO: dangling else problem */
+statement			: selection_stmt { $$ = $1; }
                     | expression_stmt { $$ = $1; }
                     | compound_stmt { $$ = $1; }
                     | iteration_stmt { $$ = $1; }
                     | return_stmt { $$ = $1; }
 					;
-selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement /* TODO: dangling else problem */
+selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement
 					{
-						/* TODO: child[0] = conditional_expression(maybe simple) , child[1] = statement, child[2] = statement */	
+                              /* TODO: dangling else problem */
+                              $$ = newTreeNode(IfStmt);
+                              $$->lineno = lineno;
+                              $$->child[0] = $3;
+                              $$->child[1] = $5;
+                              $$->child[2] = $7;
 					}
                     | IF LPAREN expression RPAREN statement 
 					{
-						/* TODO: child[0] = conditional_expression(maybe simple), child[1] = statement */
+                              $$ = newTreeNode(IfStmt);
+                              $$->lineno = lineno;
+                              $$->child[0] = $3;
+                              $$->child[1] = $5;
 					}
                     ;
 expression_stmt     : expression SEMI { }
@@ -203,13 +211,16 @@ return_stmt         : RETURN SEMI
                     ;
 expression          : var ASSIGN expression
                          { 
-                              /* TODO: child[0] = var, child[1] = expression */
+                              $$ = newTreeNode(AssignExpr);
+                              $$->lineno = $1->lineno;
+                              $$->child[0] = $1;
+                              $$->child[1] = $3;
                          }
                     | simple_expression { $$ = $1; }
                     ;
 var                 : identifier
                          { 
-							
+                              
                          }
                     | identifier LBRACE expression RBRACE
                          {
@@ -221,19 +232,24 @@ simple_expression   : additive_expression relop additive_expression
                          { 
 						/* add left-hand-side(lhs), right-hand-side(rhs) as children */
                               /* TODO: child[0] = lhs, child[1] = rhs */
+                              $$ = newTreeNode(BinOpExpr);
+                              $$->lineno = lineno;
+                              $$->opcode = $2->opcode;
+                              $$->child[0] = $1;
+                              $$->child[1] = $3;
                          }
                     | additive_expression { $$ = $1; }
                     ;
 relop               : LE { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = LE; }
                     | LT { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = LT; }
-                    | GT {  }
-                    | GE {  }
-                    | EQ {  }
-                    | NE {  }
+                    | GT { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = GT; }
+                    | GE { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = GE; }
+                    | EQ { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = EQ; }
+                    | NE { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = NE; }
                     ;
 additive_expression : additive_expression addop term
                          { 
-							
+						
                          }
 				| term {  }
 addop			: PLUS  {  }
