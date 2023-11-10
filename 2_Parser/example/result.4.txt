@@ -1,0 +1,18 @@
+
+
+Syntax tree:
+  Function Declaration: name = func, return type = void
+    Void Parameter
+    Compound Statement:
+      Variable Declaration: name = a, type = int
+      Variable Declaration: name = b, type = void[]
+      Assign:
+        Variable: name = a
+        Call: function name = input
+      Assign:
+        Variable: name = b
+        Call: function name = input
+      Call: function name = output
+        Variable: name = d
+      Non-value Return Statement
+

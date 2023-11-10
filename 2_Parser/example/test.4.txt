@@ -1,0 +1,7 @@
+void func(void)
+{
+	int a; void[] b;
+	a = input(); b = input();
+	output(d);
+    return;
+}
