@@ -249,20 +249,28 @@ relop               : LE { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->op
                     ;
 additive_expression : additive_expression addop term
                          { 
-						
+						$$ = newTreeNode(BinOpExpr);
+                              $$->lineno = lineno;
+                              $$->opcode = $2->opcode;
+                              $$->child[0] = $1;
+                              $$->child[1] = $3;
                          }
-				| term {  }
-addop			: PLUS  {  }
-				| MINUS {  }
-					;
+				| term { $$ = $1; }
+addop			: PLUS  { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = PLUS; }
+				| MINUS { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = MINUS; }
+				;
 term                : term mulop factor
 					{
-							
+						$$ = newTreeNode(BinOpExpr);
+                              $$->lineno = lineno;
+                              $$->opcode = $2->opcode;
+                              $$->child[0] = $1;
+                              $$->child[1] = $3;
 					}
-				| factor {  }
+				| factor { $$ = $1; }
 				;
-mulop               : TIMES {  }
-				| OVER  {  }
+mulop               : TIMES { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = TIMES; }
+				| OVER  { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = OVER; }
 				;
 factor              : LPAREN expression RPAREN {  }
                     | var {  }
