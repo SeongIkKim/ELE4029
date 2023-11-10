@@ -13,7 +13,7 @@
 #include "parse.h"
 
 #define YYSTYPE TreeNode *
-static TreeNode * savedTree; /* stores syntax tree for later return */
+static TreeNode * savedTree; /* stores syntax tree for later return, AST Root */
 static int yyerror(char * message);
 static int yylex(void); // added 11/2/11 to ensure no conflict with lex
 %}
@@ -34,14 +34,14 @@ program             : declaration_list { savedTree = $1; }
                     ;
 declaration_list    : declaration_list declaration
                          { 
-							YYSTYPE t = $1; 
-							if (t != NULL)
-                            {
-								while (t->sibling != NULL) t = t->sibling;
-								t->sibling = $2; 
-								$$ = $1; 
-							} 
-							else $$ = $2;
+                              YYSTYPE t = $1; 
+                              if (t != NULL)
+                              {
+                                   while (t->sibling != NULL) t = t->sibling;
+                                   t->sibling = $2; 
+                                   $$ = $1; 
+                              } 
+                              else $$ = $2;
                          }
                     | declaration { $$ = $1; }
                     ;
@@ -50,41 +50,41 @@ declaration         : var_declaration { $$ = $1; }
                     ;
 var_declaration     : type_specifier identifier SEMI
                          { 
-							$$ = newTreeNode(VariableDecl);
-							$$->lineno = $2->lineno;
-							$$->type = $1->type;
-							$$->name = $2->name;
-							free($1); free($2);
+                              $$ = newTreeNode(VariableDecl);
+                              $$->lineno = $2->lineno;
+                              $$->type = $1->type;
+                              $$->name = $2->name;
+                              free($1); free($2);
                          }
                     | type_specifier identifier LBRACE number RBRACE SEMI
                          { 
-							$$ = newTreeNode(VariableDecl);
-							$$->lineno = $2->lineno;
-							if ($1->type == Integer) $$->type = IntegerArray;
-							else if ($1->type == Void) $$->type = VoidArray;
-							else $$->type = None;
-							$$->name = $2->name;
-							$$->child[0] = $4;
-							free($1); free($2);
+                              $$ = newTreeNode(VariableDecl);
+                              $$->lineno = $2->lineno;
+                              if ($1->type == Integer) $$->type = IntegerArray;
+                              else if ($1->type == Void) $$->type = VoidArray;
+                              else $$->type = None;
+                              $$->name = $2->name;
+                              $$->child[0] = $4; /* array size */
+                              free($1); free($2);
                          }
                     ;
 type_specifier      : INT  { $$ = newTreeNode(TypeSpecifier); $$->lineno = lineno; $$->type = Integer; }
                     | VOID { $$ = newTreeNode(TypeSpecifier); $$->lineno = lineno; $$->type = Void; }
-                    ;
+                    ; /* TODO: int[], void[] type 처리 추가 */
 fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_stmt
                          { 
-							
+						/* TODO: child[0] = params, child[1] = compound_stmt */
                          }
                     ;
 params              : param_list { $$ = $1; }
                     | VOID
                          {
-							
+						/* TODO: var_declaration과 동일하게 attr로 type, name 입력 */
                          }
                     ;
 param_list          : param_list COMMA param
                          {
-							
+						/* declaration_list 참고 */	
                          }
                     | param {  }
                     ;
@@ -99,7 +99,7 @@ param               : type_specifier identifier
                     ;
 compound_stmt       : LCURLY local_declarations statement_list RCURLY
                          { 
-							
+                              /* TODO: child[0] = local_declarations, child[1] = statement_list */
                          }
                     ;
 local_declarations  : local_declarations var_declaration
@@ -110,44 +110,45 @@ local_declarations  : local_declarations var_declaration
                     ;
 statement_list      : statement_list statement
                          { 
-							
+						/* declaration_list 참고 */	
                          }
                     | empty {  }
                     ;
-statement			: selection_stmt { $$ = $1; }
-					| expression_stmt { $$ = $1; }
+statement			: selection_stmt { $$ = $1; } /* TODO: dangling else problem */
+                    | expression_stmt { $$ = $1; }
                     | compound_stmt { $$ = $1; }
                     | iteration_stmt { $$ = $1; }
                     | return_stmt { $$ = $1; }
 					;
-selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement
-						{
-							
-						}
-					| IF LPAREN expression RPAREN statement 
-						{
-							
-						}
-					;
+selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement /* TODO: dangling else problem */
+					{
+						/* TODO: child[0] = conditional_expression(maybe simple) , child[1] = statement, child[2] = statement */	
+					}
+                    | IF LPAREN expression RPAREN statement 
+					{
+						/* TODO: child[0] = conditional_expression(maybe simple), child[1] = statement */
+					}
+                    ;
 expression_stmt     : expression SEMI { }
                     | SEMI {  }
                     ;
 iteration_stmt      : WHILE LPAREN expression RPAREN statement
                          { 
-							
+						/* TODO: child[0] = conditional_expression(maybe simple), child[1] = statement */	
                          }
                     ;
 return_stmt         : RETURN SEMI 
-						{ 
+					{ 
 							
-						}
+					}
                     | RETURN expression SEMI
                          { 
+                              /* TODO: child[0] = return_expression */
                          }
                     ;
 expression          : var ASSIGN expression
                          { 
-
+                              /* TODO: child[0] = var, child[1] = expression */
                          }
                     | simple_expression { $$ = $1; }
                     ;
@@ -157,12 +158,14 @@ var                 : identifier
                          }
                     | identifier LBRACE expression RBRACE
                          {
-							
+						/* variable accessing & array indexing */
+                              /* TODO: child[0] = expression(maybe simple??) */
                          }
                     ;
 simple_expression   : additive_expression relop additive_expression
                          { 
-							
+						/* add left-hand-side(lhs), right-hand-side(rhs) as children */
+                              /* TODO: child[0] = lhs, child[1] = rhs */
                          }
                     | additive_expression { $$ = $1; }
                     ;
@@ -177,19 +180,19 @@ additive_expression : additive_expression addop term
                          { 
 							
                          }
-					| term {  }
-addop				: PLUS  {  }
-					| MINUS {  }
+				| term {  }
+addop			: PLUS  {  }
+				| MINUS {  }
 					;
 term                : term mulop factor
-						{
+					{
 							
-						}
-					| factor {  }
-					;
+					}
+				| factor {  }
+				;
 mulop               : TIMES {  }
-					| OVER  {  }
-					;
+				| OVER  {  }
+				;
 factor              : LPAREN expression RPAREN {  }
                     | var {  }
                     | call {  }
@@ -197,7 +200,7 @@ factor              : LPAREN expression RPAREN {  }
                     ;
 call                : identifier LPAREN args RPAREN
                          { 
-							
+						/* TODO: $$->name = $1->name, child[0] = args */
                          }
                     ;
 args                : arg_list {  }
@@ -205,31 +208,31 @@ args                : arg_list {  }
                     ;
 arg_list            : arg_list COMMA expression
                          {
-							YYSTYPE t = $1; 
-							if (t != NULL)
-							{ 
-								while (t->sibling != NULL) t = t->sibling;
-								t->sibling = $3; 
-								$$ = $1; 
-							} 
-							else $$ = $3;
+                              YYSTYPE t = $1; 
+                              if (t != NULL)
+                              { 
+                                   while (t->sibling != NULL) t = t->sibling;
+                                   t->sibling = $3; 
+                                   $$ = $1; 
+                              } 
+                              else $$ = $3;
                          }
                     | expression { $$ = $1; }
                     ;
-identifier			: ID
-						{
-							$$ = newTreeNode(Indentifier);
-							$$->lineno = lineno;
-							$$->name = copyString(tokenString);
-						}
-					;
-number				: NUM
-						{
-							$$ = newTreeNode(ConstExpr);
-							$$->lineno = lineno;
-							$$->val = atoi(tokenString);
-						}
-					;
+identifier		: ID
+                         {
+                              $$ = newTreeNode(Indentifier);
+                              $$->lineno = lineno;
+                              $$->name = copyString(tokenString);
+                         }
+				;
+number			: NUM
+                         {
+                              $$ = newTreeNode(ConstExpr);
+                              $$->lineno = lineno;
+                              $$->val = atoi(tokenString);
+                         }
+				;
 empty               : { $$ = NULL;}
                     ;
 
