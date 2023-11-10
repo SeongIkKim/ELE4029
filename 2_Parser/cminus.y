@@ -180,6 +180,7 @@ selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement
                               /* TODO: dangling else problem */
                               $$ = newTreeNode(IfStmt);
                               $$->lineno = lineno;
+                              $$->flag = TRUE; /* if-else */
                               $$->child[0] = $3;
                               $$->child[1] = $5;
                               $$->child[2] = $7;
@@ -205,7 +206,9 @@ iteration_stmt      : WHILE LPAREN expression RPAREN statement
                     ;
 return_stmt         : RETURN SEMI 
 					{
-                              /* TODO: ? */ 
+                              $$ = newTreeNode(ReturnStmt);
+                              $$->lineno = lineno;
+                              $$->flag = TRUE;
 					}
                     | RETURN expression SEMI
                          { 
