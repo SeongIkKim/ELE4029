@@ -33,7 +33,7 @@ static int yylex(void); // added 11/2/11 to ensure no conflict with lex
 program             : declaration_list { savedTree = $1; } 
                     ;
 declaration_list    : declaration_list declaration
-                         { 
+                         {
                               YYSTYPE t = $1; 
                               if (t != NULL)
                               {
@@ -73,28 +73,51 @@ type_specifier      : INT  { $$ = newTreeNode(TypeSpecifier); $$->lineno = linen
                     ; /* TODO: int[], void[] type 처리 추가 */
 fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_stmt
                          { 
-						/* TODO: child[0] = params, child[1] = compound_stmt */
+                              /* TODO: child[0] = params, child[1] = compound_stmt */
+                              $$ = newTreeNode(FunctionDecl);
+                              $$->lineno = $2->lineno;
+                              $$->type = $1->type;
+                              $$->name = $2->name;
+                              $$->child[0] = $4; /* params */
+                              $$->child[1] = $6; /* compound_stmt */
+                              free($1); free($2);
                          }
                     ;
 params              : param_list { $$ = $1; }
                     | VOID
                          {
-						/* TODO: var_declaration과 동일하게 attr로 type, name 입력 */
+                              $$ = newTreeNode(Params);
+                              $$->lineno = lineno;
+                              $$->flag = TRUE;
                          }
                     ;
 param_list          : param_list COMMA param
                          {
 						/* declaration_list 참고 */	
+                              YYSTYPE t = $1;
+                              while (t->sibling != NULL) t = t->sibling;
+                              t->sibling = $3;
+                              $$ = $1;
                          }
-                    | param {  }
+                    | param { $$ = $1; }
                     ;
 param               : type_specifier identifier
                          {
-						
+						$$ = newTreeNode(Params);
+                              $$->lineno = $2->lineno;
+                              $$->type = $1->type;
+                              $$->name = $2->name;
+                              free($1); free($2);
                          }
                     | type_specifier identifier LBRACE RBRACE
                          { 
-							
+                              $$ = newTreeNode(Params);
+                              $$->lineno = $2->lineno;
+                              if ($1->type == Integer) $$->type = IntegerArray;
+                              else if ($1->type == Void) $$->type = VoidArray;
+                              else $$->type = None;
+                              $$->name = $2->name;
+                              free($1); free($2);
                          }
                     ;
 compound_stmt       : LCURLY local_declarations statement_list RCURLY
