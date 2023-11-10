@@ -1,5 +1,5 @@
 
-C-MINUS COMPILATION: ./test.2.txt
+C-MINUS COMPILATION: example/test.2.txt
 
 Syntax tree:
   Function Declaration: name = main, return type = void

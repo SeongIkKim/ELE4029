@@ -174,7 +174,7 @@ statement			: selection_stmt { $$ = $1; }
                     | compound_stmt { $$ = $1; }
                     | iteration_stmt { $$ = $1; }
                     | return_stmt { $$ = $1; }
-					;
+				;
 selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement
 					{
                               /* TODO: dangling else problem */
@@ -197,16 +197,21 @@ expression_stmt     : expression SEMI { }
                     ;
 iteration_stmt      : WHILE LPAREN expression RPAREN statement
                          { 
-						/* TODO: child[0] = conditional_expression(maybe simple), child[1] = statement */	
+                              $$ = newTreeNode(WhileStmt);
+                              $$->lineno = lineno;
+                              $$->child[0] = $3;
+                              $$->child[1] = $5;
                          }
                     ;
 return_stmt         : RETURN SEMI 
-					{ 
-							
+					{
+                              /* TODO: ? */ 
 					}
                     | RETURN expression SEMI
                          { 
-                              /* TODO: child[0] = return_expression */
+                              $$ = newTreeNode(ReturnStmt);
+                              $$->lineno = lineno;
+                              $$->child[0] = $2;
                          }
                     ;
 expression          : var ASSIGN expression
@@ -282,10 +287,13 @@ factor              : LPAREN expression RPAREN {  }
                     ;
 call                : identifier LPAREN args RPAREN
                          { 
-						/* TODO: $$->name = $1->name, child[0] = args */
+                              $$ = newTreeNode(CallExpr);
+                              $$->lineno = $1->lineno;
+                              $$->name = $1->name;
+                              $$->child[0] = $3;
                          }
                     ;
-args                : arg_list {  }
+args                : arg_list { $$ = $1; }
                     | empty {  }
                     ;
 arg_list            : arg_list COMMA expression
