@@ -192,7 +192,7 @@ selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement
                               $$->child[1] = $5;
 					}
                     ;
-expression_stmt     : expression SEMI { }
+expression_stmt     : expression SEMI { $$ = $1; }
                     | SEMI {  }
                     ;
 iteration_stmt      : WHILE LPAREN expression RPAREN statement
@@ -230,7 +230,6 @@ var                 : identifier
                               $$ = newTreeNode(VarAccessExpr);
                               $$->lineno = $1->lineno;
                               $$->name = $1->name;
-                              /* TODO: free? */
                          }
                     | identifier LBRACE expression RBRACE
                          {
@@ -282,10 +281,10 @@ term                : term mulop factor
 mulop               : TIMES { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = TIMES; }
 				| OVER  { $$ = newTreeNode(Opcode); $$->lineno = lineno; $$->opcode = OVER; }
 				;
-factor              : LPAREN expression RPAREN {  }
-                    | var {  }
-                    | call {  }
-                    | number {  }
+factor              : LPAREN expression RPAREN { $$ = $2; }
+                    | var { $$ = $1; }
+                    | call { $$ = $1; }
+                    | number { $$ = $1; }
                     ;
 call                : identifier LPAREN args RPAREN
                          { 
