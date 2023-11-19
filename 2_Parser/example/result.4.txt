@@ -1,4 +1,5 @@
 
+C-MINUS COMPILATION: example/test.4.txt
 
 Syntax tree:
   Function Declaration: name = func, return type = void
@@ -15,4 +16,3 @@ Syntax tree:
       Call: function name = output
         Variable: name = d
       Non-value Return Statement
-

@@ -177,7 +177,6 @@ statement			: selection_stmt { $$ = $1; }
 				;
 selection_stmt		: IF LPAREN expression RPAREN statement ELSE statement
 					{
-                              /* TODO: dangling else problem */
                               $$ = newTreeNode(IfStmt);
                               $$->lineno = lineno;
                               $$->flag = TRUE; /* if-else */
@@ -297,7 +296,7 @@ call                : identifier LPAREN args RPAREN
                          }
                     ;
 args                : arg_list { $$ = $1; }
-                    | empty {  }
+                    | empty { $$ = $1; }
                     ;
 arg_list            : arg_list COMMA expression
                          {
