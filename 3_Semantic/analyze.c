@@ -320,14 +320,9 @@ static void checkNode(TreeNode *t)
 			// Error Check
 			ERROR_CHECK(t->child[0] != NULL);
 			// Semantic Error: Invalid Condition in If/If-Else, While Statement
-			/*********************Fill the Code*************************
-			 TODO: condition문 int value check                                                          *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			************************************************************/
-			
+			// Impl : condition문 int value check
+			if (t->child[0]->type != Integer) InvalidConditionError(t->lineno);
+
 			// Break
 			break;
 		}
@@ -414,15 +409,11 @@ static void checkNode(TreeNode *t)
 			{
 				// Semantic Error: Index to Not Array				
 				// Semantic Error: Index is not Integer in Array Indexing
-				/*********************Fill the Code*************************
-				index가 있는데 array가 아닌 경우 체크
-				-> array인데 index가 int가 아닌 경우 체크
-				 *                                                         *
-				 *                                                         *
-				 *                                                         *
-				 *                                                         *
-				 *                                                         *
-				************************************************************/
+				// Impl: index가 있는데 array가 아닌 경우 체크
+				// -> array인데 index가 int가 아닌 경우 체크
+				if (symbol->type != IntegerArray) ArrayIndexingError2(t->name, t->lineno);
+				else if (t->child[0]->type != Integer) ArrayIndexingError(t->name, t->lineno);
+
 				// Update Node Type
 				t->type = Integer;
 			}
