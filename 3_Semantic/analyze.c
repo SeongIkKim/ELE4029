@@ -381,14 +381,26 @@ static void checkNode(TreeNode *t)
 			// Semantic Error: Invalid Arguments
 			TreeNode *paramNode = calleeSymbol->node->child[0];
 			TreeNode *argNode = t->child[0];
-			/*********************Fill the Code*************************
-			function parameter와 argument 맞는지 체크
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			************************************************************/
+
+			for (int i=0; i<MAXCHILDREN && paramNode != NULL && argNode != NULL; i++)
+			{
+				// Impl: parameter와 argument의 type이 다른 경우 에러 처리
+				if (paramNode->type != argNode->type) InvalidFunctionCallError(t->name, t->lineno);
+				
+				// 다음 노드로 이동
+				paramNode = paramNode->sibling;
+				argNode = argNode->sibling;
+			}
+			// Impl: parameter와 argument의 개수가 다른 경우 에러 처리
+			while (paramNode) {
+				if (paramNode->type != Void) InvalidFunctionCallError(t->name, t->lineno);
+				paramNode = paramNode->sibling;
+			}
+			while (argNode) {
+				if (argNode->type != Void) InvalidFunctionCallError(t->name, t->lineno);
+				argNode = argNode->sibling;
+			}
+
 			// Update Node Type
 			t->type = calleeSymbol->type;
 			// Break
