@@ -336,16 +336,7 @@ static void checkNode(TreeNode *t)
 			{
 				if (t->child[0] == NULL || t->child[0]->type != currentScope->func->type) InvalidReturnError(t->lineno);
 			}			
-
-			/*********************Fill the Code*************************
-			TODO: return type check
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			************************************************************/
-			// Break
+			
 			break;
 		}
 		// Assignment, Binary Operator Expression
