@@ -336,27 +336,33 @@ static void checkNode(TreeNode *t)
 			{
 				if (t->child[0] == NULL || t->child[0]->type != currentScope->func->type) InvalidReturnError(t->lineno);
 			}			
-			
+
 			break;
 		}
 		// Assignment, Binary Operator Expression
 		case AssignExpr:
+		{
+			// Error Check
+			ERROR_CHECK(t->child[0] != NULL && t->child[1] != NULL);
+			
+			// Semantic Error: Invalid Assignment
+			// Impl: assignment의 경우 LHS와 RHS의 type이 같아야함
+			if (t->child[0]->type != t->child[1]->type) InvalidAssignmentError(t->lineno);
+			
+			// Update Node Type // 구현 유의 : operation의 결과 type이 되어 다음 assignment의 RHS type이 됨
+			t->type = t->child[0]->type; 
+
+			break;
+		}
 		case BinOpExpr:
 		{
 			// Error Check
 			ERROR_CHECK(t->child[0] != NULL && t->child[1] != NULL);
-			// Semantic Error: Invalid Assignment / Operation
-			/*********************Fill the Code*************************
-			TODO: operation : 타입 체크(int[] + int[], int[] + int, void+void not allowed)
-			TODO: (Optional) assignment : LHS RHS 타입 체크 -> typecheck() 사용해야할듯?
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			************************************************************/
+			// Semantic Error: Operation
+			// Impl: operation인 경우 int + int를 제외한 모든 경우 에러 처리
+			if (t->child[0]->type != Integer || t->child[1]->type != Integer) InvalidOperationError(t->lineno);
 			// Update Node Type
-			t->type = t->child[0]->type;
+			t->type = t->child[0]->type; 
 			// Break
 			break;
 		}
