@@ -1,0 +1,10 @@
+my_result/
+my_result
+
+cminus_semantic
+lex.yy.c
+y.output
+y.tab.c
+y.tab.h
+
+

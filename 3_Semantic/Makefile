@@ -44,3 +44,6 @@ analyze.o: analyze.c analyze.h globals.h y.tab.h symtab.h util.h
 
 symtab.o: symtab.c symtab.h
 	$(CC) $(CFLAGS) -c symtab.c
+
+test :
+	sh test.sh
