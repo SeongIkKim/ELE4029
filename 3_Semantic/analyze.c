@@ -208,7 +208,7 @@ static void insertNode(TreeNode *t)
 		// Call Function
 		case CallExpr:
 		{
-			// Semantic Error: Undeclared Functions 
+			// Semantic Error: Undeclared Functions  // TODO: 구현 유의 
 			SymbolRec *func = lookupSymbolWithKind(globalScope, t->name, FunctionSym);
 			if (func == NULL) func = UndeclaredFunctionError(globalScope, t);
 			// Update Symbol Table Entry
@@ -356,9 +356,8 @@ static void checkNode(TreeNode *t)
 			ERROR_CHECK(t->child[0] != NULL && t->child[1] != NULL);
 			// Semantic Error: Invalid Assignment / Operation
 			/*********************Fill the Code*************************
-			TODO: assignment : LHS RHS 타입 체크 -> typecheck() 사용해야할듯?
 			TODO: operation : 타입 체크(int[] + int[], int[] + int, void+void not allowed)
-			TODO: assignment is not necessarry for operations? -> ????
+			TODO: (Optional) assignment : LHS RHS 타입 체크 -> typecheck() 사용해야할듯?
 			 *                                                         *
 			 *                                                         *
 			 *                                                         *
@@ -417,7 +416,7 @@ static void checkNode(TreeNode *t)
 				// Semantic Error: Index is not Integer in Array Indexing
 				/*********************Fill the Code*************************
 				index가 있는데 array가 아닌 경우 체크
-				index가 int가 아닌 경우 체크
+				-> array인데 index가 int가 아닌 경우 체크
 				 *                                                         *
 				 *                                                         *
 				 *                                                         *
@@ -444,7 +443,6 @@ static void checkNode(TreeNode *t)
 		// Variable Declaration, Function Declaration, Compound Statement, Parameters
 		case FunctionDecl:
 		case VariableDecl:
-			// TODO: void type variable declaration 불가 
 		case Params:
 		case CompoundStmt:
 			// Do Nothing

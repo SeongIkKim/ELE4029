@@ -40,7 +40,7 @@ FILE *code;
 int EchoSource = FALSE;
 int TraceScan = FALSE;
 int TraceParse = FALSE;
-int TraceAnalyze = FALSE; // TODO: TRUE // TODO: 최종제출시 삭제
+int TraceAnalyze = FALSE;
 int TraceCode = FALSE;
 
 int Error = FALSE;
