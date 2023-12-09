@@ -179,22 +179,21 @@ static void insertNode(TreeNode *t)
 		{
 			// Void Parameters: Do Nothing
 			if (t->flag == TRUE) break;
+
+			// Impl: void Type Parameter Check & Redefined parameter check
+			for (int i=0; i<MAXCHILDREN && t->child[i] != NULL; i++)
+			{
+				// Semantic Error: Void-Type Parameters
+				if (t->child[i]->type == Void || t->child[i]->type == VoidArray) VoidTypeVariableError(t->child[i]->name, t->child[i]->lineno);
+
+				// Semantic Error: Redefined Variables // TODO: 구현유의 - parameter는 function scope에만 존재
+				SymbolRec *symbol = lookupSymbolInCurrentScope(currentScope, t->child[i]->name);
+				if (symbol != NULL) RedefinitionError(t->child[i]->name, t->child[i]->lineno, symbol);
+
+				// Insert New Variable Symbol to Symbol Table
+				insertSymbol(currentScope, t->child[i]->name, t->child[i]->type, VariableSym, t->child[i]->lineno, t->child[i]);
+			}
 			
-			// Semantic Error: Void-Type Parameters
-			// Semantic Error: Redefined Variables
-			// Insert New Variable Symbol to Symbol Table
-			/*********************Fill the Code*************************
-			TODO: void parameter인 경우 에러 처리
-			TODO: symtab에 있는 변수인 경우 에러 처리
-			TODO: parameter를 symtab에 추가
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			************************************************************/
-			
-			// Break
 			break;
 		}
 		// Compound Statements

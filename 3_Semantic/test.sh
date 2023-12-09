@@ -36,7 +36,6 @@ for file in "${cm_files[@]}"; do
         rm "$diff_output"
     else
         echo "File '$file'의 실행 결과가 '$expected_output'와 일치하지 않습니다. 차이점은 '$diff_output'에 저장되었습니다."
-        cat "$diff_output"
     fi
     
     # 임시 파일 삭제
