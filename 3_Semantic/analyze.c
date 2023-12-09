@@ -149,9 +149,9 @@ static void insertNode(TreeNode *t)
 		// Variable Declaration
 		case VariableDecl:
 		{
-			// Semantic Error: Void-Type Variables // TODO: 구현 유의
+			// Semantic Error: Void-Type Variables // 구현 유의
 			if (t->type == Void || t->type == VoidArray) VoidTypeVariableError(t->name, t->lineno);
-			// Semantic Error: Redefined Variables // TODO: 구현 유의
+			// Semantic Error: Redefined Variables // 구현 유의
 			SymbolRec *symbol = lookupSymbolInCurrentScope(currentScope, t->name);
 			if (symbol != NULL) RedefinitionError(t->name, t->lineno, symbol);
 			// Insert New Variable Symbol to Symbol Table
@@ -180,20 +180,18 @@ static void insertNode(TreeNode *t)
 			// Void Parameters: Do Nothing
 			if (t->flag == TRUE) break;
 
-			// Impl: void Type Parameter Check & Redefined parameter check
-			for (int i=0; i<MAXCHILDREN && t->child[i] != NULL; i++)
-			{
-				// Semantic Error: Void-Type Parameters
-				if (t->child[i]->type == Void || t->child[i]->type == VoidArray) VoidTypeVariableError(t->child[i]->name, t->child[i]->lineno);
+			// Semantic Error: Void-Type Parameters
+			// Impl: void 파라미터 체크
+			if (t->type == Void || t->type == VoidArray) VoidTypeVariableError(t->name, t->lineno);
 
-				// Semantic Error: Redefined Variables // TODO: 구현유의 - parameter는 function scope에만 존재
-				SymbolRec *symbol = lookupSymbolInCurrentScope(currentScope, t->child[i]->name);
-				if (symbol != NULL) RedefinitionError(t->child[i]->name, t->child[i]->lineno, symbol);
+			// Semantic Error: Redefined Variables // 구현 유의 - parameter는 function scope에서만 체크
+			// Impl: Redefined parameter check
+			SymbolRec *symbol = lookupSymbolInCurrentScope(currentScope, t->name);
+			if (symbol != NULL) RedefinitionError(t->name, t->lineno, symbol);
 
-				// Insert New Variable Symbol to Symbol Table
-				insertSymbol(currentScope, t->child[i]->name, t->child[i]->type, VariableSym, t->child[i]->lineno, t->child[i]);
-			}
-			
+			// Insert New Variable Symbol to Symbol Table
+			insertSymbol(currentScope, t->name, t->type, VariableSym, t->lineno, t);
+
 			break;
 		}
 		// Compound Statements
@@ -459,7 +457,3 @@ static void checkNode(TreeNode *t)
 void typeCheck(TreeNode *syntaxTree) {
 	traverse(syntaxTree, scopeIn, checkNode);
 }
-
-// TODO: input() 구현
-
-// TODO: output() 구현
