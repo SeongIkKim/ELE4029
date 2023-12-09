@@ -208,7 +208,7 @@ static void insertNode(TreeNode *t)
 		// Call Function
 		case CallExpr:
 		{
-			// Semantic Error: Undeclared Functions  // TODO: 구현 유의 
+			// Semantic Error: Undeclared Functions  // 구현 유의 - function scope는 global이므로 scope가 global임을 유의
 			SymbolRec *func = lookupSymbolWithKind(globalScope, t->name, FunctionSym);
 			if (func == NULL) func = UndeclaredFunctionError(globalScope, t);
 			// Update Symbol Table Entry
