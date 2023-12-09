@@ -324,7 +324,19 @@ static void checkNode(TreeNode *t)
 		{
 			// Error Check
 			ERROR_CHECK(currentScope->func != NULL);
-			// Semantic Error: Invalid Return
+			// Semantic Error: Invalid Return (compare return type and function type)
+			// Impl: return type과 function type 같지않으면 에러 처리
+			// 1. function type이 void인데 [return 노드가 있다 && return 노드가 void 타입이다]
+			// 2. function type이 void가 아닌데 [return 노드가 없다 OR return type과 function type이 다르다]
+			if (currentScope->func->type == Void )
+			{
+				if (t->child[0] != NULL && t->child[0]->type != Void) InvalidReturnError(t->lineno);
+			} 
+			else
+			{
+				if (t->child[0] == NULL || t->child[0]->type != currentScope->func->type) InvalidReturnError(t->lineno);
+			}			
+
 			/*********************Fill the Code*************************
 			TODO: return type check
 			 *                                                         *
