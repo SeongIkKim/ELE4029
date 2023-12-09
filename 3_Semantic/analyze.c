@@ -220,19 +220,13 @@ static void insertNode(TreeNode *t)
 		// Variable Access
 		case VarAccessExpr:
 		{
-			// Semantic Error: Undeclared Variables // TODO: 구현유의
+			// Semantic Error: Undeclared Variables
 			// Update Symbol Table Entry
-			/*********************Fill the Code*************************
-			TODO: variable이 없는 경우 에러 처리
-			TODO: CallExpr 코드 참고해서 update symbol table entry
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			 *                                                         *
-			************************************************************/
-			
-			// Break
+			// Impl: variable이 없는 경우 에러 처리 // 구현유의 - c언어 scope를 따야하는데, global이나 static 키워드를 지원하지 않으므로 local scope로 판단
+			SymbolRec *var = lookupSymbolWithKind(currentScope, t->name, VariableSym);
+			if (var == NULL) var = UndeclaredVariableError(currentScope, t);
+			else
+				appendSymbol(currentScope, t->name, t->lineno);
 			break;
 		}
 		// If/If-Else, While, Return Statements
