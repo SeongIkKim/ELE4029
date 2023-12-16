@@ -312,7 +312,7 @@ static void checkNode(TreeNode *t)
 			ERROR_CHECK(t->child[0] != NULL);
 			// Semantic Error: Invalid Condition in If/If-Else, While Statement
 			// Impl : condition문 int value check
-			if (t->child[0]->type != Integer) InvalidConditionError(t->lineno);
+			if (t->child[0]->type != Integer) InvalidConditionError(t->child[0]->lineno);
 
 			// Break
 			break;
@@ -383,7 +383,8 @@ static void checkNode(TreeNode *t)
 			for (int i=0; i<MAXCHILDREN && paramNode != NULL && argNode != NULL; i++)
 			{
 				// Impl: parameter와 argument의 type이 다른 경우 에러 처리
-				if (paramNode->type != argNode->type) InvalidFunctionCallError(t->name, t->lineno);
+				// Edge case : parameter가 void인 경우는 argument가 NULL이어야하는데 이 루프로 들어온 시점에서 argument가 NULL인 경우는 없음
+				if ((paramNode->type != argNode->type) || (paramNode->type == Void)) InvalidFunctionCallError(t->name, t->lineno);
 				
 				// 다음 노드로 이동
 				paramNode = paramNode->sibling;
