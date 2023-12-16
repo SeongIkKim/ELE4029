@@ -27,7 +27,7 @@ for file in "${cm_files[@]}"; do
     ./"$cminus_executable" "$file" > "$temp_output"
     
     # testresult 디렉토리의 동일한 파일명의 결과 파일
-    expected_output="./testresult/$(basename ${file%.*}).result"
+    expected_output="./testresult/$(basename ${file%.*})_result"
     
     # 결과 비교 및 차이점 출력
     diff_output="$result_directory/$(basename ${file%.*}).diff"

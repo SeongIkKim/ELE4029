@@ -22,7 +22,7 @@ mkdir -p "$result_directory"
 
 # 각 *.cm 파일에 대해 cminus_semantic 실행 및 결과 저장
 for file in "${cm_files[@]}"; do
-    output_file="$result_directory/$(basename ${file%.*}).result"
+    output_file="$result_directory/$(basename ${file%.*})_result"
     ./"$cminus_executable" "$file" > "$output_file"
     echo "File '$file'의 실행 결과는 '$output_file'에 저장되었습니다."
 done
